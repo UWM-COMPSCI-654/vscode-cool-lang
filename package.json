@@ -1,0 +1,27 @@
+{
+    "name": "cool-uwm",
+    "displayName": "language-cool",
+    "description": "(UWM) Cool (Classroom Object Oriented Language) language support for vscode",
+    "version": "0.0.1",
+    "publisher": "amir734jj",
+    "engines": {
+        "vscode": "^1.0.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "repository": "https://github.com/UWM-COMPSCI-654/vscode-cool-lang",
+    "contributes": {
+        "languages": [{
+            "id": "cool",
+            "aliases": ["COOL", "cool"],
+            "extensions": [".cool"],
+            "configuration": "./cool.configuration.json"
+        }],
+        "grammars": [{
+            "language": "cool",
+            "scopeName": "source.cool",
+            "path": "./syntaxes/cool.json"
+        }]
+    }
+}
