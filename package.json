@@ -1,8 +1,8 @@
 {
     "name": "cool-uwm",
-    "displayName": "language-cool",
+    "displayName": "language-cool-uwm",
     "description": "(UWM) Cool (Classroom Object Oriented Language) language support for vscode",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "amir734jj",
     "engines": {
         "vscode": "^1.0.0"

@@ -154,7 +154,7 @@
           "name": "keyword.control.cool"
         },
         {
-          "match": "\\b(extends|var|new|native)\\b",
+          "match": "\\b(extends|var|new|native|override|def)\\b",
           "name": "keyword.operator.cool"
         }
       ]
