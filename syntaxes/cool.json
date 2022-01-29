@@ -41,7 +41,7 @@
       ]
     },
     "class": {
-      "begin": "((?i:class))\\s+([a-zA-Z][A-Za-z0-9_]*)(\\s+((?i:extends))\\s+([a-zA-Z][A-Za-z0-9_]*))?\\b",
+      "begin": "((?i:class))\\s+(\\w+)\\((\\s*var\\s+\\w+\\s*:\\s*\\w+\\s*,?)*\\)(\\s+((?i:extends))\\s+(\\w+))?\\b",
       "beginCaptures": {
         "1": {
           "name": "storage.type.cool"
@@ -162,7 +162,7 @@
     "method": {
       "patterns": [
         {
-          "match": "\\bdef\\s+([a-zA-Z][A-Za-z0-9_]*)\\s*\\(\\s*(?:([a-zA-Z][A-Za-z0-9_]*)\\s*:\\s*([a-zA-Z][A-Za-z0-9_]*))?(?:\\s*,\\s*([a-zA-Z][A-Za-z0-9_]*)\\s*:\\s*([a-zA-Z][A-Za-z0-9_]*))*\\s*\\)\\s*:\\s*([a-zA-Z][A-Za-z0-9_]*)\\s*=\\s*\\b",
+          "match": "\\bdef\\s+(\\w*)\\s*\\(\\s*(?:(\\w*)\\s*:\\s*(\\w*))?(?:\\s*,\\s*(\\w*)\\s*:\\s*(\\w*))*\\s*\\)\\s*:\\s*(\\w*)\\s*=\\s*\\b",
           "name": "meta.method.cool",
           "captures": {
             "1": {
