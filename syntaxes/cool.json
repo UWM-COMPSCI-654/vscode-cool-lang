@@ -27,11 +27,11 @@
     "builtins": {
       "patterns": [
         {
-          "match": "(Int|String|Boolean|IO|Any|Unit|ArrayAny|Symbol|Statistics)",
+          "match": "\\b(Int|String|Boolean|IO|Any|Unit|ArrayAny|Symbol|Statistics)\\b",
           "name": "support.class.cool"
         },
         {
-          "match": "(equals|abort|out|out_string|in|length|concat|substring|is_null|toString|indexOf)",
+          "match": "\\b(equals|abort|out|out_string|out_any|in|length|concat|substring|is_null|toString|indexOf)\\b",
           "name": "support.function.cool"
         },
         {
@@ -162,7 +162,7 @@
     "method": {
       "patterns": [
         {
-          "match": "\\bdef\\s+(\\w*)\\s*\\(\\s*(?:(\\w*)\\s*:\\s*(\\w*))?(?:\\s*,\\s*(\\w*)\\s*:\\s*(\\w*))*\\s*\\)\\s*:\\s*(\\w*)\\s*=\\s*\\b",
+          "match": "\\bdef\\s+(\\w*)\\s*\\(\\s*(?:(\\w*)\\s*:\\s*(\\w*))?(?:\\s*,\\s*(\\w*)\\s*:\\s*(\\w*))*\\s*\\)\\s*:\\s*(\\w*)\\s*=\\s*",
           "name": "meta.method.cool",
           "captures": {
             "1": {
