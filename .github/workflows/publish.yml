@@ -31,8 +31,10 @@ jobs:
           PUBLISHER=$(node -p "require('./package.json').publisher")
           EXTENSION_NAME=$(node -p "require('./package.json').name")
           
-          if vsce show ${PUBLISHER}.${EXTENSION_NAME} --json 2>/dev/null | grep -q "\"version\":\"${PACKAGE_VERSION}\""; then
-            echo "Version ${PACKAGE_VERSION} already exists"
+          echo "Checking if version ${PACKAGE_VERSION} exists for ${PUBLISHER}.${EXTENSION_NAME}"
+          
+          if vsce show ${PUBLISHER}.${EXTENSION_NAME} --json 2>/dev/null | grep -o "\"version\": *\"[^\"]*\"" | grep -q "\"${PACKAGE_VERSION}\""; then
+            echo "Version ${PACKAGE_VERSION} already exists in marketplace"
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "Version ${PACKAGE_VERSION} does not exist, will publish"
