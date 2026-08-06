@@ -31,13 +31,15 @@
     "scripts": {
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
+        "bundle": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
         "build-server": "node scripts/build-server.js",
-        "vscode:prepublish": "npm run compile"
+        "vscode:prepublish": "npm run bundle"
     },
     "devDependencies": {
         "@types/node": "^20.0.0",
         "@types/vscode": "^1.75.0",
         "@vscode/vsce": "^3.0.0",
+        "esbuild": "^0.25.0",
         "typescript": "^5.0.0"
     },
     "dependencies": {
