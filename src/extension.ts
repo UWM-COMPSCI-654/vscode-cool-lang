@@ -1,6 +1,4 @@
-import * as cp from 'child_process';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import { commands, debug, DebugConfiguration, DebugConfigurationProvider, ExtensionContext, ProviderResult, window, workspace, WorkspaceFolder, CancellationToken } from 'vscode';
 import {
@@ -86,20 +84,6 @@ function debugCoolFile(context: ExtensionContext): void {
     debug.startDebugging(workspace.workspaceFolders?.[0], config);
 }
 
-function buildCoolProgram(cli: string, coolFile: string, outputDir: string): string | undefined {
-    try {
-        cp.execSync(`"${cli}" build csharp --input "${coolFile}" --output "${outputDir}"`, {
-            stdio: 'pipe',
-            timeout: 30000,
-        });
-        return path.join(outputDir, 'CoolProgram.dll');
-    } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        window.showErrorMessage(`COOL build failed: ${msg}`);
-        return undefined;
-    }
-}
-
 class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
     constructor(private context: ExtensionContext) {}
 
@@ -120,23 +104,20 @@ class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
         }
 
         const cli = getCliBinaryPath(this.context);
-        const buildDir = path.join(os.tmpdir(), 'cool-debug', path.basename(coolFile, '.cool'));
 
-        const dllPath = buildCoolProgram(cli, coolFile, buildDir);
-        if (!dllPath) {
-            return undefined;
-        }
-
-        // Delegate to the coreclr debugger (provided by the C# extension)
+        // Launch the self-contained CLI binary under the coreclr debugger.
+        // The CLI compiles & runs the Cool program in-process; when a
+        // debugger is attached it writes DLL+PDB with #line directives
+        // so breakpoints in .cool files work.
         return {
             type: 'coreclr',
             request: 'launch',
             name: config.name,
-            program: dllPath,
+            program: cli,
+            args: ['run', 'csharp', '--input', coolFile],
             cwd: path.dirname(coolFile),
             console: 'integratedTerminal',
             stopAtEntry: config.stopOnEntry ?? false,
-            sourceFileMap: config.sourceFileMap,
         };
     }
 }
