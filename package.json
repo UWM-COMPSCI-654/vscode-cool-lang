@@ -26,7 +26,25 @@
             "language": "cool",
             "scopeName": "source.cool",
             "path": "./syntaxes/cool.json"
-        }]
+        }],
+        "commands": [{
+            "command": "cool.run",
+            "title": "Run COOL Program",
+            "category": "COOL",
+            "icon": "$(play)"
+        }],
+        "keybindings": [{
+            "command": "cool.run",
+            "key": "f5",
+            "when": "editorLangId == cool"
+        }],
+        "menus": {
+            "editor/title/run": [{
+                "command": "cool.run",
+                "when": "editorLangId == cool",
+                "group": "navigation"
+            }]
+        }
     },
     "scripts": {
         "compile": "tsc -p ./",
