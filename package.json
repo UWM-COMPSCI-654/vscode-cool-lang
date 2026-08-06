@@ -35,7 +35,7 @@
         }],
         "keybindings": [{
             "command": "cool.run",
-            "key": "f5",
+            "key": "ctrl+shift+r",
             "when": "editorLangId == cool"
         }],
         "menus": {
