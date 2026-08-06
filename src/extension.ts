@@ -5,7 +5,6 @@ import {
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
-    TransportKind,
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
@@ -38,10 +37,10 @@ function resolveServerOptions(context: ExtensionContext): ServerOptions {
     const binaryPath = context.asAbsolutePath(path.join('server', binaryName));
 
     if (fs.existsSync(binaryPath)) {
-        return { command: binaryPath, args: ['lsp'], transport: TransportKind.stdio };
+        return { command: binaryPath, args: ['lsp'] };
     }
 
     // Fallback: framework-dependent — requires dotnet on PATH (dev mode)
     const dllPath = context.asAbsolutePath(path.join('server', 'Cli.dll'));
-    return { command: 'dotnet', args: [dllPath, 'lsp'], transport: TransportKind.stdio };
+    return { command: 'dotnet', args: [dllPath, 'lsp'] };
 }
