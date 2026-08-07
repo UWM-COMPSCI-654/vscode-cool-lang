@@ -12,9 +12,9 @@ else if (os === 'darwin') rid = arch() === 'arm64' ? 'osx-arm64' : 'osx-x64';
 else rid = arch() === 'arm64' ? 'linux-arm64' : 'linux-x64';
 
 const cliProj = path.resolve(__dirname, '..', '..', 'Cli', 'Cli.csproj');
-const outDir = path.resolve(__dirname, '..', 'server');
+const outDir = path.resolve(__dirname, '..', 'server', rid);
 
-console.log(`Publishing self-contained server for ${rid} -> server/`);
+console.log(`Publishing self-contained server for ${rid} -> server/${rid}/`);
 execSync(
     `dotnet publish "${cliProj}" -c Release -r ${rid} --self-contained true -p:PublishSingleFile=true -o "${outDir}"`,
     { stdio: 'inherit' }
