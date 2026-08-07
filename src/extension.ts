@@ -37,15 +37,17 @@ export async function activate(context: ExtensionContext): Promise<void> {
         clientOptions
     );
 
+    const debugBinary = getDebugBinaryPath(context);
+
     context.subscriptions.push(
         commands.registerCommand('cool.run', () => runCoolFile(cliBinary))
     );
 
     context.subscriptions.push(
-        commands.registerCommand('cool.debug', () => debugCoolFile(cliBinary))
+        commands.registerCommand('cool.debug', () => debugCoolFile(debugBinary ?? cliBinary))
     );
 
-    const debugProvider = new CoolDebugConfigurationProvider(cliBinary);
+    const debugProvider = new CoolDebugConfigurationProvider(debugBinary ?? cliBinary);
     context.subscriptions.push(
         debug.registerDebugConfigurationProvider('cool', debugProvider)
     );
@@ -65,6 +67,17 @@ function getVsceTarget(): string {
     if (p === 'win32') return 'win32-x64';
     if (p === 'darwin') return a === 'arm64' ? 'darwin-arm64' : 'darwin-x64';
     return a === 'arm64' ? 'linux-arm64' : 'linux-x64';
+}
+
+function getDebugBinaryPath(context: ExtensionContext): string | undefined {
+    const binaryName = getBinaryName();
+    // Bundled non-single-file build (vsdbg compatible)
+    const bundled = context.asAbsolutePath(path.join('server-debug', binaryName));
+    if (fs.existsSync(bundled)) return bundled;
+    // Also check globalStorage for downloaded debug binary
+    const downloaded = path.join(context.globalStorageUri.fsPath, 'server-debug', binaryName);
+    if (fs.existsSync(downloaded)) return downloaded;
+    return undefined;
 }
 
 async function ensureServerBinary(context: ExtensionContext): Promise<string | undefined> {
@@ -200,7 +213,7 @@ function debugCoolFile(cli: string): void {
         request: 'launch',
         name: 'Debug COOL Program',
         program: cli,
-        args: ['--debug-wait', 'run', 'csharp', '--input', coolFile],
+        args: ['run', 'csharp', '--input', coolFile],
         cwd: path.dirname(coolFile),
         console: 'integratedTerminal',
         justMyCode: false,
@@ -252,7 +265,7 @@ class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
             request: 'launch',
             name: config.name,
             program: this.cli,
-            args: ['--debug-wait', 'run', 'csharp', '--input', coolFile],
+            args: ['run', 'csharp', '--input', coolFile],
             cwd: path.dirname(coolFile),
             console: 'integratedTerminal',
             justMyCode: false,
