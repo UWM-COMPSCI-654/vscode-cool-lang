@@ -16,6 +16,7 @@
         "onLanguage:cool"
     ],
     "contributes": {
+        "breakpoints": [{ "language": "cool" }],
         "languages": [{
             "id": "cool",
             "aliases": ["COOL", "cool"],
