@@ -12,9 +12,7 @@
     ],
     "repository": "https://github.com/UWM-COMPSCI-654/vscode-cool-lang",
     "main": "./out/extension",
-    "activationEvents": [
-        "onLanguage:cool"
-    ],
+    "activationEvents": [],
     "contributes": {
         "languages": [{
             "id": "cool",
