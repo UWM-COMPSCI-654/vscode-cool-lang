@@ -16,7 +16,6 @@
         "onLanguage:cool"
     ],
     "contributes": {
-        "breakpoints": [{ "language": "cool" }],
         "languages": [{
             "id": "cool",
             "aliases": ["COOL", "cool"],
@@ -27,75 +26,6 @@
             "language": "cool",
             "scopeName": "source.cool",
             "path": "./syntaxes/cool.json"
-        }],
-        "commands": [{
-            "command": "cool.run",
-            "title": "Run COOL Program",
-            "category": "COOL",
-            "icon": "$(play)"
-        }, {
-            "command": "cool.debug",
-            "title": "Debug COOL Program",
-            "category": "COOL",
-            "icon": "$(debug-alt)"
-        }],
-        "keybindings": [{
-            "command": "cool.run",
-            "key": "ctrl+shift+r",
-            "when": "editorLangId == cool"
-        }, {
-            "command": "cool.debug",
-            "key": "ctrl+shift+d",
-            "when": "editorLangId == cool"
-        }],
-        "menus": {
-            "editor/title/run": [{
-                "command": "cool.run",
-                "when": "editorLangId == cool",
-                "group": "navigation"
-            }, {
-                "command": "cool.debug",
-                "when": "editorLangId == cool",
-                "group": "navigation"
-            }]
-        },
-        "debuggers": [{
-            "type": "cool",
-            "label": "COOL Debug",
-            "languages": ["cool"],
-            "configurationAttributes": {
-                "launch": {
-                    "required": ["program"],
-                    "properties": {
-                        "program": {
-                            "type": "string",
-                            "description": "Path to the .cool file to debug",
-                            "default": "${file}"
-                        },
-                        "stopOnEntry": {
-                            "type": "boolean",
-                            "description": "Stop on the first line of user code",
-                            "default": false
-                        }
-                    }
-                }
-            },
-            "configurationSnippets": [{
-                "label": "COOL: Launch",
-                "description": "Debug a COOL program",
-                "body": {
-                    "type": "cool",
-                    "request": "launch",
-                    "name": "Debug COOL Program",
-                    "program": "^\"\\${file}\""
-                }
-            }],
-            "initialConfigurations": [{
-                "type": "cool",
-                "request": "launch",
-                "name": "Debug COOL Program",
-                "program": "${file}"
-            }]
         }]
     },
     "scripts": {

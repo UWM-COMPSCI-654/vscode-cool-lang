@@ -2,7 +2,7 @@ import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as path from 'path';
-import { commands, debug, DebugConfiguration, DebugConfigurationProvider, ExtensionContext, ProgressLocation, ProviderResult, window, workspace, WorkspaceFolder, CancellationToken } from 'vscode';
+import { ExtensionContext, ProgressLocation, window, workspace } from 'vscode';
 import {
     LanguageClient,
     LanguageClientOptions,
@@ -37,22 +37,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
         clientOptions
     );
 
-    const debugBinary = getDebugBinaryPath(context);
-
-    context.subscriptions.push(
-        commands.registerCommand('cool.run', () => runCoolFile(cliBinary))
-    );
-
-    context.subscriptions.push(
-        commands.registerCommand('cool.debug', () => debugCoolFile(debugBinary ?? cliBinary))
-    );
-
-    const debugProvider = new CoolDebugConfigurationProvider(debugBinary ?? cliBinary);
-    context.subscriptions.push(
-        debug.registerDebugConfigurationProvider('cool', debugProvider)
-    );
-
     await client.start();
+}
+
+export function deactivate(): Thenable<void> | undefined {
+    return client?.stop();
 }
 
 // --- Server binary resolution ---
@@ -67,17 +56,6 @@ function getVsceTarget(): string {
     if (p === 'win32') return 'win32-x64';
     if (p === 'darwin') return a === 'arm64' ? 'darwin-arm64' : 'darwin-x64';
     return a === 'arm64' ? 'linux-arm64' : 'linux-x64';
-}
-
-function getDebugBinaryPath(context: ExtensionContext): string | undefined {
-    const binaryName = getBinaryName();
-    // Bundled non-single-file build (vsdbg compatible)
-    const bundled = context.asAbsolutePath(path.join('server-debug', binaryName));
-    if (fs.existsSync(bundled)) return bundled;
-    // Also check globalStorage for downloaded debug binary
-    const downloaded = path.join(context.globalStorageUri.fsPath, 'server-debug', binaryName);
-    if (fs.existsSync(downloaded)) return downloaded;
-    return undefined;
 }
 
 async function ensureServerBinary(context: ExtensionContext): Promise<string | undefined> {
@@ -169,110 +147,4 @@ function extractZip(zipPath: string, destDir: string): Promise<void> {
             : `unzip -o "${zipPath}" -d "${destDir}"`;
         cp.exec(cmd, (err) => err ? reject(err) : resolve());
     });
-}
-
-// --- Run & Debug ---
-
-function runCoolFile(cli: string): void {
-    const editor = window.activeTextEditor;
-    if (!editor || editor.document.languageId !== 'cool') {
-        window.showErrorMessage('Open a .cool file first.');
-        return;
-    }
-
-    if (editor.document.isDirty) {
-        editor.document.save();
-    }
-
-    const filePath = editor.document.uri.fsPath;
-    const cmd = `& "${cli}" run csharp --input "${filePath}"`;
-
-    let terminal = window.terminals.find((t: { name: string }) => t.name === 'COOL');
-    if (!terminal) {
-        terminal = window.createTerminal('COOL');
-    }
-    terminal.show(true);
-    terminal.sendText(cmd);
-}
-
-function debugCoolFile(cli: string): void {
-    const editor = window.activeTextEditor;
-    if (!editor || editor.document.languageId !== 'cool') {
-        window.showErrorMessage('Open a .cool file first.');
-        return;
-    }
-
-    if (editor.document.isDirty) {
-        editor.document.save();
-    }
-
-    const coolFile = editor.document.uri.fsPath;
-
-    const config: DebugConfiguration = {
-        type: 'coreclr',
-        request: 'launch',
-        name: 'Debug COOL Program',
-        program: cli,
-        args: ['run', 'csharp', '--input', coolFile],
-        cwd: path.dirname(coolFile),
-        console: 'integratedTerminal',
-        justMyCode: false,
-    };
-
-    debug.startDebugging(workspace.workspaceFolders?.[0], config);
-}
-
-class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
-    constructor(private cli: string) {}
-
-    // Called when F5 is pressed with no launch.json or an incomplete config
-    resolveDebugConfiguration(
-        _folder: WorkspaceFolder | undefined,
-        config: DebugConfiguration,
-        _token?: CancellationToken
-    ): ProviderResult<DebugConfiguration> {
-        if (!config.type && !config.request && !config.name) {
-            // No launch.json — provide a default config for the active file
-            const editor = window.activeTextEditor;
-            if (editor && editor.document.languageId === 'cool') {
-                config.type = 'cool';
-                config.request = 'launch';
-                config.name = 'Run COOL Program';
-                config.program = editor.document.uri.fsPath;
-            }
-        }
-        return config;
-    }
-
-    resolveDebugConfigurationWithSubstitutedVariables(
-        _folder: WorkspaceFolder | undefined,
-        config: DebugConfiguration,
-        _token?: CancellationToken
-    ): ProviderResult<DebugConfiguration> {
-        const coolFile = config.program;
-        if (!coolFile || !coolFile.endsWith('.cool')) {
-            window.showErrorMessage('Specify a .cool file as the "program" in your launch configuration.');
-            return undefined;
-        }
-
-        if (!fs.existsSync(coolFile)) {
-            window.showErrorMessage(`File not found: ${coolFile}`);
-            return undefined;
-        }
-
-        return {
-            type: 'coreclr',
-            request: 'launch',
-            name: config.name,
-            program: this.cli,
-            args: ['run', 'csharp', '--input', coolFile],
-            cwd: path.dirname(coolFile),
-            console: 'integratedTerminal',
-            justMyCode: false,
-        };
-    }
-}
-
-export function deactivate(): Thenable<void> | undefined {
-    return client?.stop();
 }
