@@ -183,9 +183,30 @@ function runCoolFile(cli: string): void {
 }
 
 function debugCoolFile(cli: string): void {
-    // coreclr can't attach to single-file .NET 10 apps;
-    // fall back to running in a terminal.
-    runCoolFile(cli);
+    const editor = window.activeTextEditor;
+    if (!editor || editor.document.languageId !== 'cool') {
+        window.showErrorMessage('Open a .cool file first.');
+        return;
+    }
+
+    if (editor.document.isDirty) {
+        editor.document.save();
+    }
+
+    const coolFile = editor.document.uri.fsPath;
+
+    const config: DebugConfiguration = {
+        type: 'coreclr',
+        request: 'launch',
+        name: 'Debug COOL Program',
+        program: cli,
+        args: ['--debug-wait', 'run', 'csharp', '--input', coolFile],
+        cwd: path.dirname(coolFile),
+        console: 'integratedTerminal',
+        justMyCode: false,
+    };
+
+    debug.startDebugging(workspace.workspaceFolders?.[0], config);
 }
 
 class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
@@ -226,9 +247,16 @@ class CoolDebugConfigurationProvider implements DebugConfigurationProvider {
             return undefined;
         }
 
-        // Run in terminal since coreclr can't debug single-file .NET 10 apps
-        runCoolFile(this.cli);
-        return undefined;
+        return {
+            type: 'coreclr',
+            request: 'launch',
+            name: config.name,
+            program: this.cli,
+            args: ['--debug-wait', 'run', 'csharp', '--input', coolFile],
+            cwd: path.dirname(coolFile),
+            console: 'integratedTerminal',
+            justMyCode: false,
+        };
     }
 }
 
